@@ -1,0 +1,354 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>50Q Mock Test — Offline Single-file</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#071021,var(--bg));color:#e6eef6;display:flex;align-items:flex-start;justify-content:center;padding:28px}
+    .app{width:100%;max-width:980px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    header h1{font-size:18px;margin:0}
+    .meta{font-size:13px;color:var(--muted)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.6);}
+    .layout{display:grid;grid-template-columns:1fr 300px;gap:12px}
+    .question-area{min-height:420px}
+    .qtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .qindex{font-weight:600}
+    .timer{background:var(--glass);padding:8px 10px;border-radius:10px;color:var(--accent);font-weight:600}
+    .qbox{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px}
+    .options{margin-top:12px}
+    .option{display:block;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid transparent}
+    .option input{margin-right:10px}
+    textarea{width:100%;min-height:140px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .controls{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
+    button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#002;cursor:pointer}
+    .navpanel{background:rgba(255,255,255,0.01);padding:12px;border-radius:8px}
+    .qn-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .qn{padding:8px;border-radius:6px;text-align:center;cursor:pointer;border:1px dashed rgba(255,255,255,0.03)}
+    .qn.done{background:linear-gradient(90deg, rgba(6,182,212,0.12), rgba(6,182,212,0.06));border:1px solid rgba(6,182,212,0.18)}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+    .results{padding:14px;background:rgba(0,0,0,0.2);border-radius:10px}
+    a.link{color:var(--accent);text-decoration:none}
+    .export{background:#fff;color:#002;padding:8px;border-radius:8px}
+    @media (max-width:900px){.layout{grid-template-columns:1fr} .navpanel{order:2}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>50-Q Mock Test — Constitutional Development (Demo)</h1>
+        <div class="meta">Single-file HTML — works locally or on any static host (GitHub Pages / Netlify)</div>
+      </div>
+      <div class="timer card" id="top-timer">Time: --:--</div>
+    </header><div class="card layout">
+  <main class="question-area">
+    <div class="qtop">
+      <div>
+        <div class="qindex">Question <span id="q-number">1</span> / <span id="q-total">50</span></div>
+        <div class="small" id="q-type">Type: MCQ</div>
+      </div>
+      <div class="small">Test: <strong id="test-title">Constitutional Development — 50Q</strong></div>
+    </div>
+
+    <div class="qbox">
+      <div id="question-text">Loading question...</div>
+      <div class="options" id="options-area"></div>
+    </div>
+
+    <div class="controls">
+      <div>
+        <button id="prev-btn">◀ Prev</button>
+        <button id="next-btn">Next ▶</button>
+        <button id="mark-btn">Mark for Review</button>
+      </div>
+      <div>
+        <button id="submit-btn">Submit Test</button>
+      </div>
+    </div>
+
+    <div id="status-msg" class="small" style="margin-top:10px"></div>
+  </main>
+
+  <aside class="navpanel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div><strong>Navigation</strong></div>
+      <div class="small">Remaining: <span id="remaining-count">50</span></div>
+    </div>
+
+    <div class="qn-grid" id="qn-grid"></div>
+
+    <hr style="margin:10px 0;border-color:rgba(255,255,255,0.03)" />
+
+    <div class="small" style="margin-bottom:8px">Test settings</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select id="time-select">
+        <option value="30">30 min</option>
+        <option value="45">45 min</option>
+        <option value="60" selected>60 min</option>
+        <option value="90">90 min</option>
+      </select>
+      <button id="start-btn">Start/Resume</button>
+    </div>
+
+    <div class="small" style="margin-top:8px">Progress</div>
+    <div class="small" id="progress">Answered: 0 | Reviewed: 0</div>
+
+    <div style="margin-top:10px">
+      <button id="export-btn" class="export">Export Responses (CSV)</button>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="small">MCQ Auto-score will be shown after submission. Essay/Long answers are saved for manual grading.</div>
+    </div>
+
+  </aside>
+</div>
+
+<footer>
+  Built for quick testing. Host anywhere static. Want me to pre-fill 50 real MCQs from the chapter? Reply "pre-fill".
+</footer>
+
+  </div>  <script>
+    // ====== CONFIG ======
+    const TOTAL_Q = 50;
+    // Questions template: type 'mcq' or 'essay'. For mcq provide options array and correct index (0-based).
+    // We'll programmatically generate 50 demo questions. Replace these with real questions or fetch via JSON.
+    const QUESTIONS = Array.from({length: TOTAL_Q}).map((_,i)=>{
+      if(i%5 === 4){ // every 5th question as essay
+        return {id: i+1, type:'essay', text:`(Essay) Explain the significance of constitutional reform topic #${i+1} in 3-5 lines.`}
+      }
+      // MCQ demo
+      return {
+        id: i+1,
+        type:'mcq',
+        text:`Which act/event best describes milestone #${i+1} in India's constitutional development?`,
+        options:[`Option A for Q${i+1}` , `Option B for Q${i+1}`, `Option C for Q${i+1}`, `Option D for Q${i+1}`],
+        correct: (i%4) // demo correct
+      }
+    });
+
+    // ====== STATE ======
+    let state = {
+      current:0,
+      answers: JSON.parse(localStorage.getItem('mock_answers_v1')||'{}'),
+      marked: new Set(JSON.parse(localStorage.getItem('mock_marked_v1')||'[]')),
+      startedAt: null,
+      timeLimitMinutes: parseInt(document.getElementById('time-select').value,10),
+      remainingSeconds: null,
+      timerInterval: null
+    }
+
+    // ======= UI BUILD ======
+    const qTotalEl = document.getElementById('q-total'); qTotalEl.textContent = TOTAL_Q;
+    const qNumberEl = document.getElementById('q-number');
+    const qTypeEl = document.getElementById('q-type');
+    const qTextEl = document.getElementById('question-text');
+    const optionsArea = document.getElementById('options-area');
+    const qnGrid = document.getElementById('qn-grid');
+    const remainingCount = document.getElementById('remaining-count');
+
+    // create nav buttons
+    QUESTIONS.forEach((q,idx)=>{
+      const el = document.createElement('div'); el.className='qn'; el.textContent = q.id; el.dataset.idx=idx;
+      el.addEventListener('click',()=>{gotoQuestion(idx)});
+      qnGrid.appendChild(el);
+    })
+
+    function refreshNav(){
+      const nums = qnGrid.children;
+      let answered=0, reviewed=0;
+      for(let i=0;i<nums.length;i++){
+        const el = nums[i]; const idx = +el.dataset.idx;
+        const q = QUESTIONS[idx];
+        el.classList.remove('done');
+        if(state.answers[q.id]){ el.classList.add('done'); answered++; }
+        if(state.marked.has(q.id)) reviewed++;
+      }
+      remainingCount.textContent = TOTAL_Q - answered;
+      document.getElementById('progress').textContent = `Answered: ${answered} | Reviewed: ${reviewed}`;
+    }
+
+    function renderQuestion(idx){
+      const q = QUESTIONS[idx];
+      state.current = idx;
+      qNumberEl.textContent = q.id;
+      qTypeEl.textContent = 'Type: ' + (q.type==='mcq'?'MCQ':'Essay');
+      qTextEl.textContent = q.text;
+      optionsArea.innerHTML='';
+
+      if(q.type==='mcq'){
+        q.options.forEach((opt,i)=>{
+          const id = `opt-${q.id}-${i}`;
+          const wrapper = document.createElement('label'); wrapper.className='option';
+          wrapper.innerHTML = `<input name='q-${q.id}' type='radio' value='${i}' id='${id}'> ${opt}`;
+          optionsArea.appendChild(wrapper);
+        });
+        // preselect
+        const ans = state.answers[q.id];
+        if(typeof ans !== 'undefined' && ans !== null){
+          const inp = document.querySelector(`input[name='q-${q.id}'][value='${ans}']`);
+          if(inp) inp.checked = true;
+        }
+      } else {
+        const ta = document.createElement('textarea'); ta.id = `essay-${q.id}`; ta.placeholder='Type your answer here... (will be saved for manual grading)';
+        ta.value = state.answers[q.id] || '';
+        optionsArea.appendChild(ta);
+      }
+      refreshNav();
+    }
+
+    function saveAnswerForCurrent(){
+      const q = QUESTIONS[state.current];
+      if(q.type==='mcq'){
+        const sel = document.querySelector(`input[name='q-${q.id}']:checked`);
+        if(sel) state.answers[q.id] = parseInt(sel.value,10);
+        else delete state.answers[q.id];
+      } else {
+        const ta = document.getElementById(`essay-${q.id}`);
+        if(ta && ta.value.trim()) state.answers[q.id] = ta.value.trim();
+        else delete state.answers[q.id];
+      }
+      persistState(); refreshNav();
+    }
+
+    function persistState(){
+      localStorage.setItem('mock_answers_v1', JSON.stringify(state.answers));
+      localStorage.setItem('mock_marked_v1', JSON.stringify(Array.from(state.marked)));
+    }
+
+    function gotoQuestion(idx){
+      saveAnswerForCurrent(); renderQuestion(idx);
+    }
+
+    document.getElementById('next-btn').addEventListener('click',()=>{ saveAnswerForCurrent(); if(state.current < TOTAL_Q-1) gotoQuestion(state.current+1); });
+    document.getElementById('prev-btn').addEventListener('click',()=>{ saveAnswerForCurrent(); if(state.current > 0) gotoQuestion(state.current-1); });
+    document.getElementById('mark-btn').addEventListener('click',()=>{ const qid = QUESTIONS[state.current].id; if(state.marked.has(qid)) state.marked.delete(qid); else state.marked.add(qid); persistState(); refreshNav(); });
+
+    // Start timer logic
+    function startTimer(){
+      if(!state.startedAt) state.startedAt = Date.now();
+      state.timeLimitMinutes = parseInt(document.getElementById('time-select').value,10);
+      if(!state.remainingSeconds) state.remainingSeconds = state.timeLimitMinutes * 60;
+      if(state.timerInterval) clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(()=>{
+        state.remainingSeconds--;
+        updateTimerUI();
+        if(state.remainingSeconds <= 0){ clearInterval(state.timerInterval); autoSubmit(); }
+      },1000);
+      persistState();
+    }
+
+    function updateTimerUI(){
+      const sec = Math.max(0, state.remainingSeconds || 0);
+      const m = Math.floor(sec/60); const s = sec%60;
+      document.getElementById('top-timer').textContent = `Time: ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    document.getElementById('start-btn').addEventListener('click',()=>{ if(!state.remainingSeconds) state.remainingSeconds = parseInt(document.getElementById('time-select').value,10)*60; startTimer(); });
+
+    // Submit logic
+    document.getElementById('submit-btn').addEventListener('click',()=>{ if(confirm('Submit test now? You cannot change after submission.')) doSubmit(); });
+
+    function autoSubmit(){ alert('Time up — auto-submitting the test'); doSubmit(); }
+
+    function doSubmit(){
+      saveAnswerForCurrent(); clearInterval(state.timerInterval);
+      // scoring for MCQ
+      let mcqTotal=0, mcqCorrect=0;
+      QUESTIONS.forEach(q=>{ if(q.type==='mcq') mcqTotal++; });
+      QUESTIONS.forEach(q=>{
+        if(q.type==='mcq'){
+          const ans = state.answers[q.id];
+          if(typeof ans !== 'undefined' && ans !== null){ if(ans === q.correct) mcqCorrect++; }
+        }
+      });
+      const mcqScore = `${mcqCorrect} / ${mcqTotal}`;
+
+      // Build results view
+      const out = document.createElement('div'); out.className='card results';
+      out.innerHTML = `<h3>Test Submitted</h3>
+        <p class='small'>MCQ Auto-score: <strong>${mcqScore}</strong></p>
+        <p class='small'>Essay answers: <strong>${QUESTIONS.filter(q=>q.type==='essay').length}</strong> (save or grade manually)</p>
+        <div style='margin-top:8px'><button id='download-all'>Download all responses (CSV)</button> <button id='grade-essays'>Show Essays</button></div>
+      `;
+
+      document.querySelector('.question-area').innerHTML=''; document.querySelector('.question-area').appendChild(out);
+
+      document.getElementById('download-all').addEventListener('click',()=>downloadCSV());
+      document.getElementById('grade-essays').addEventListener('click',()=>showEssaysForGrading());
+
+      // persist final
+      localStorage.setItem('mock_final_result_v1', JSON.stringify({submittedAt:Date.now(), mcqScore, answers:state.answers}));
+    }
+
+    // CSV export
+    function downloadCSV(){
+      const rows = [['QID','Type','Question','Answer','CorrectOption(if MCQ)']];
+      QUESTIONS.forEach(q=>{
+        const ans = state.answers[q.id] ? state.answers[q.id] : '';
+        const correct = q.type==='mcq' ? q.options[q.correct] : '';
+        const ansText = (q.type==='mcq' && typeof ans === 'number') ? q.options[ans] : ans;
+        rows.push([q.id,q.type,q.text,`"${String(ansText).replace(/\"/g,'"') }"`, correct]);
+      });
+      const csv = rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'"')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='mock_responses.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function showEssaysForGrading(){
+      const essays = QUESTIONS.filter(q=>q.type==='essay');
+      const cont = document.createElement('div'); cont.className='card results';
+      cont.innerHTML = '<h3>Essay Responses</h3>';
+      essays.forEach(q=>{
+        const block = document.createElement('div'); block.style.marginBottom='10px';
+        const ans = state.answers[q.id] || '';
+        block.innerHTML = `<div style='font-weight:600'>Q${q.id}: ${q.text}</div><div style='margin-top:6px'><textarea data-qid='${q.id}' style='min-height:100px'>${ans}</textarea></div><div style='margin-top:6px'>Score (0-10): <input type='number' min='0' max='10' data-score-q='${q.id}' /></div>`;
+    cont.appendChild(block);
+  });
+  const finish = document.createElement('div'); finish.style.marginTop='8px'; finish.innerHTML = `<button id='save-grades'>Save Essay Grades & Compute Final</button>`;
+  cont.appendChild(finish);
+  document.querySelector('.question-area').innerHTML=''; document.querySelector('.question-area').appendChild(cont);
+  document.getElementById('save-grades').addEventListener('click',()=>{ saveEssayGrades(); });
+}
+
+function saveEssayGrades(){
+  const gradeInputs = document.querySelectorAll('[data-score-q]');
+  const essayGrades = {};
+  gradeInputs.forEach(inp=>{ const qid = inp.dataset.scoreQ; const v = inp.value; if(v) essayGrades[qid]=Number(v); });
+  // compute final
+  const mcqTotal=QUESTIONS.filter(q=>q.type==='mcq').length;
+  let mcqCorrect=0; QUESTIONS.forEach(q=>{ if(q.type==='mcq'){ const ans = state.answers[q.id]; if(typeof ans !== 'undefined' && ans === q.correct) mcqCorrect++; }});
+  const mcqScoreNumeric = (mcqCorrect/mcqTotal)*60; // weight example: MCQ 60 points
+  let essayTotalPoints=0; let essayMax=0;
+  Object.keys(essayGrades).forEach(k=>{ essayTotalPoints += essayGrades[k]; essayMax += 10; });
+  const essayScoreNumeric = essayMax? (essayTotalPoints/essayMax)*40 : 0; // essays 40 points
+  const final = mcqScoreNumeric + essayScoreNumeric;
+  alert(`Final computed (sample weights): ${final.toFixed(2)} / 100\n(MCQ ${mcqScoreNumeric.toFixed(2)} + Essay ${essayScoreNumeric.toFixed(2)})`);
+
+  // save to localStorage for record
+  const rec = {computedAt:Date.now(), final, mcq:{mcqTotal,mcqCorrect}, essayGrades};
+  localStorage.setItem('mock_score_record', JSON.stringify(rec));
+}
+
+// export button
+document.getElementById('export-btn').addEventListener('click',()=>downloadCSV());
+
+// quick init
+renderQuestion(0); updateTimerUI(); refreshNav();
+
+// auto-save periodically
+setInterval(()=>{ saveAnswerForCurrent(); persistState(); },15000);
+
+// warn on leave
+window.addEventListener('beforeunload', (e)=>{ e.returnValue = 'Your answers are saved locally. Are you sure you want to leave?'; });
+
+  </script>
+</body>
+</html>
