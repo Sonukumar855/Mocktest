@@ -1,67 +1,380 @@
 <!doctype html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mock Test – 100 Questions (Hindi + English)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mock Test — 100 Questions (Hindi + English)</title>
 <style>
- body{font-family:Arial;background:#0d1117;color:#eee;padding:20px}
- .card{background:#161b22;padding:20px;border-radius:8px;max-width:900px;margin:auto}
- button{padding:10px 16px;border:none;border-radius:6px;background:#2384f5;color:#fff;margin:5px}
- .nav{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:10px}
- .nav button{background:#30363d}
- .qbox{margin-top:20px}
- .opts{margin-top:10px}
+  :root{--bg:#071021;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071021,#04101a);color:#e6eef6}
+  .wrap{max-width:1100px;margin:20px auto;padding:18px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .title{font-size:18px}
+  .meta{color:var(--muted);font-size:13px}
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:12px}
+  .qbox{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px;min-height:260px}
+  .options{margin-top:12px}
+  label.option{display:block;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.01);cursor:pointer}
+  .controls{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#002;cursor:pointer}
+  .navpanel{background:rgba(255,255,255,0.01);padding:12px;border-radius:8px}
+  .qn-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .qn{padding:8px;border-radius:6px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.01)}
+  .qn.answered{background:linear-gradient(90deg,rgba(6,182,212,0.08),rgba(6,182,212,0.03))}
+  .small{font-size:13px;color:var(--muted)}
+  @media (max-width:980px){.layout{grid-template-columns:1fr} .navpanel{order:2}}
 </style>
 </head>
 <body>
-<div class="card">
-<h2>Mock Test – 100 Questions (Hindi + English)</h2>
-<div id="timer">Time: 00:00</div>
-<hr>
-<div id="qbox"></div>
-<div class="nav" id="nav"></div>
-<button onclick="prevQ()">Prev</button>
-<button onclick="nextQ()">Next</button>
-<button onclick="submitTest()">Submit</button>
-</div>
-<script>
-let index=0;
-const QUESTIONS=[
- {q:"The Regulating Act of 1773 was introduced under which British Prime Minister? / 1773 का रेगुलेटिंग एक्ट किस ब्रिटिश प्रधानमंत्री के समय लागू हुआ?",opts:["Lord North","Pitt","Melbourne","Disraeli"],a:0},
- {q:"Which Act created the office of the Governor-General of Bengal? / किस अधिनियम ने बंगाल के गवर्नर-जनरल का पद बनाया?",opts:["Regulating Act 1773","Pitt’s India Act 1784","Charter Act 1813","Charter Act 1833"],a:0},
- {q:"Pitt’s India Act of 1784 established a dual system of control between ___? / 1784 के पिट्स इंडिया एक्ट ने किसके बीच द्वैध नियंत्रण बनाया?",opts:["Crown and Company","Company and Provinces","Crown and Parliament","Parliament and Governor"],a:0},
- {q:"Which Act ended the monopoly of the East India Company over trade with India? / किस अधिनियम ने ईस्ट इंडिया कंपनी के व्यापारिक एकाधिकार को समाप्त किया?",opts:["Charter Act 1813","Regulating Act 1773","Act of 1909","Act of 1935"],a:0},
- {q:"The Charter Act of 1833 made the Governor-General of Bengal the Governor-General of ___? / 1833 के चार्टर एक्ट ने बंगाल के गवर्नर-जनरल को किसका गवर्नर-जनरल बनाया?",opts:["British India","Madras","Bombay","Burma"],a:0},
- {q:"Which Act first introduced a Law Commission in India? / किस अधिनियम ने पहली बार भारत में विधि आयोग स्थापित किया?",opts:["Charter Act 1833","Act of 1909","Act of 1919","Act of 1935"],a:0},
- {q:"Who was the first Law Member added to the Governor-General’s Council? / गवर्नर-जनरल की परिषद में पहला विधि सदस्य कौन था?",opts:["Macaulay","Cornwallis","Ripon","Irwin"],a:0},
- {q:"Which Act separated legislative and executive functions for the first time? / किस अधिनियम ने पहली बार विधायी और कार्यकारी कार्यों को अलग किया?",opts:["Indian Councils Act 1861","Act of 1909","Act of 1919","Act of 1935"],a:0},
- {q:"Which Act allowed Indians to be appointed as members of the Governor-General’s Council for the first time? / किस अधिनियम ने पहली बार भारतीयों को गवर्नर-जनरल की परिषद में नियुक्त करने की अनुमति दी?",opts:["Indian Councils Act 1861","Act of 1909","Act of 1919","Act of 1935"],a:0},
- {q:"Who was the first Indian appointed to the Governor-General’s Council? / गवर्नर-जनरल की परिषद में नियुक्त होने वाले पहले भारतीय कौन थे?",opts:["Satyendra Prasad Sinha","Madan Mohan Malviya","Gopal Krishna Gokhale","Dadabhai Naoroji"],a:0},
- {q:"The Indian Councils Act 1892 increased the number of ___? / 1892 के भारतीय परिषद अधिनियम ने किसकी संख्या बढ़ाई?",opts:["Legislative Council members","Governors","High Courts","Provinces"],a:0},
- {q:"Indian Councils Act 1892 introduced which feature? / 1892 के अधिनियम ने कौन-सी विशेषता शुरू की?",opts:["Indirect elections","Dyarchy","Separate electorate","Provincial autonomy"],a:0},
- {q:"Which Act introduced separate electorates for Muslims? / किस अधिनियम ने मुसलमानों के लिए पृथक निर्वाचिका की व्यवस्था की?",opts:["Indian Councils Act 1909","Act of 1919","Act of 1935","Charter Act 1833"],a:0},
- {q:"The Morley–Minto Reforms are related to which year? / मॉर्ले-मिंटो सुधार किस वर्ष से संबंधित हैं?",opts:["1909","1919","1935","1861"],a:0},
- {q:"Who was the Viceroy during the 1909 reforms? / 1909 सुधारों के समय वायसराय कौन थे?",opts:["Lord Minto","Lord Hardinge","Lord Chelmsford","Lord Linlithgow"],a:0},
- {q:"Which Act introduced Dyarchy in Provinces? / किस अधिनियम ने प्रांतों में द्वैध शासन शुरू किया?",opts:["Government of India Act 1919","Act of 1935","Act of 1909","Act of 1861"],a:0},
- {q:"Dyarchy divided subjects into ___? / द्वैध शासन ने विषयों को किसमें विभाजित किया?",opts:["Reserved and Transferred","Union and State","Central and Local","General and Special"],a:0},
- {q:"Which reforms are known as Montagu–Chelmsford Reforms? / किस सुधार को मांटेग्यू-चेम्सफोर्ड सुधार कहा जाता है?",opts:["1919 Act","1935 Act","1909 Act","1861 Act"],a:0},
- {q:"The Government of India Act 1919 extended communal representation to __? / 1919 अधिनियम ने साम्प्रदायिक प्रतिनिधित्व किस तक बढ़ाया?",opts:["Sikhs, Anglo-Indians, Indian Christians","Only Muslims","Only Hindus","Only Christians"],a:0},
- {q:"Which Act created a Public Service Commission in India for the first time? / किस अधिनियम ने पहली बार भारत में लोक सेवा आयोग बनाया?",opts:["Government of India Act 1919","Act of 1935","Act of 1909","Act of 1861"],a:0},
- {q:"Which Act is the longest Act passed by the British Parliament for India? / भारत के लिए ब्रिटिश संसद द्वारा पारित सबसे लंबा अधिनियम कौन सा है?",opts:["Government of India Act 1935","Act of 1919","Act of 1909","Act of 1861"],a:0},
- {q:"The Government of India Act 1935 introduced ___? / 1935 अधिनियम ने क्या शुरू किया?",opts:["Provincial Autonomy","Separate Electorate","Dyarchy","Indirect elections"],a:0},
- {q:"Which Act proposed an All-India Federation? / किस अधिनियम ने अखिल भारतीय महासंघ का प्रस्ताव दिया?",opts:["Government of India Act 1935","Act of 1919","Act of 1909","Act of 1861"],a:0},
- {q:"Which Act abolished Dyarchy at the Provincial level? / किस अधिनियम ने प्रांतीय स्तर पर द्वैध शासन समाप्त किया?",opts:["Government of India Act 1935","Act of 1919","Act of 1909","Act of 1861"],a:0},
- {q:"Which Act introduced Dyarchy at the Centre? / किस अधिनियम ने केंद्र में द्वैध शासन शुरू किया?",opts:["Government of India Act 1935","1919 Act","1909 Act","1861 Act"],a:0},
- {q:"Which Act first provided for a Federal Court in India? / किस अधिनियम ने भारत में संघीय न्यायालय का प्रावधान किया?",opts:["Government of India Act 1935","Act of 1919","1909 Act","1861 Act"],a:0},
- {q:"Federal Court in India started functioning from? / भारत में संघीय न्यायालय ने किस वर्ष कार्य शुरू किया?",opts:["1937","1940","1935","1942"],a:0},
- {q:"Which Act provided for the establishment of the Reserve Bank of India? / किस अधिनियम ने भारतीय रिजर्व बैंक की स्थापना का प्रावधान किया?",opts:["Government of India Act 1935","Act of 1919","1909 Act","1861 Act"],a:0},
- {q:"When was RBI established? / RBI की स्थापना कब हुई?",opts:["1935","1947","1950","1920"],a:0},
- {q:"Which Act formed the basis of the Indian Constitution? / किस अधिनियम ने भारतीय संविधान का आधार तैयार किया?",opts:["Government of India Act 1935","Act of 1919","Act of 1909","Act of 1861"],a:0},
- {q:"Which Commission recommended abolition of Provincial Dyarchy? / किस आयोग ने प्रांतीय द्वैध शासन समाप्त करने की सिफारिश की?",opts:["Simon Commission","Hunter Commission","Fraser Commission","Whitley Commission"],a:0},
- {q:"Simon Commission came to India in? / साइमन आयोग भारत कब आया?",opts:["1928","1927","1929","1930"],a:0},
- {q:"Why was Simon Commission boycotted? / साइमन आयोग का बहिष्कार क्यों हुआ?",opts:["No Indian member","High taxes","Military issues",function load(){ let q=QUESTIONS[index]; let h=<div class='qbox'><h3>Q${index+1}: ${q.q}</h3><div class='opts'>; q.opts.forEach((o,i)=>{ h+=<label><input type='radio' name='opt' value='${i}'> ${o}</label><br>; }) h+=</div></div>; document.getElementById('qbox').innerHTML=h; } function buildNav(){ let h=""; for(let i=0;i<QUESTIONS.length;i++) h+=<button onclick='jump(${i})'>${i+1}</button>; document.getElementById('nav').innerHTML=h; } function prevQ(){ if(index>0){ index--; load(); }} function nextQ(){ if(index<QUESTIONS.length-1){ index++; load(); }} function jump(i){ index=i; load(); } function submitTest(){ alert("Test submitted!"); } buildNav(); load(); </script>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div>
+        <div class="title">Mock Test — 100 Questions (Hindi + English)</div>
+        <div class="meta">Bilingual (English / हिंदी) — SSC / TCS style — Constitutional Development set (part 1)</div>
+      </div>
+      <div class="small" id="timer">Time: 00:00</div>
+    </header>
 
-</body>
-</html>
+    <div class="layout">
+      <main>
+        <div class="qtop small">Question <span id="qnum">1</span> / <span id="qtotal">100</span> — <span id="qtype">MCQ</span></div>
+        <div class="qbox" id="qbox">
+          Loading...
+        </div>
+
+        <div class="controls">
+          <div>
+            <button id="prevBtn">◀ Prev</button>
+            <button id="nextBtn">Next ▶</button>
+            <button id="markBtn">Mark</button>
+          </div>
+          <div>
+            <button id="submitBtn">Submit Test</button>
+          </div>
+        </div>
+        <div class="small" id="status" style="margin-top:8px"></div>
+      </main>
+
+      <aside class="navpanel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div><strong>Navigation</strong></div>
+          <div class="small">Remaining: <span id="remaining">100</span></div>
+        </div>
+        <div class="qn-grid" id="qnGrid"></div>
+
+        <hr style="margin:10px 0;border-color:rgba(255,255,255,0.03)">
+
+        <div class="small" style="margin-bottom:8px">Test settings</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="timeSelect">
+            <option value="60">60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">120 min</option>
+          </select>
+          <button id="startBtn">Start/Resume</button>
+        </div>
+
+        <div class="small">Progress</div>
+        <div class="small" id="progress">Answered: 0 | Marked: 0</div>
+        <div style="margin-top:10px"><button id="exportBtn">Export (CSV)</button></div>
+      </aside>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// === Working mock-test app core (keeps state, renders, scoring)
+// QUESTIONS array (Part 1: Q1–Q25). Each item is bilingual and unique.
+const QUESTIONS = [
+  {id:1, type:'mcq',
+   text:{en:'Which Act/event best describes milestone #1 in India\'s constitutional development? (Choose the best)', hi:'भारत के संवैधानिक विकास में सर्वप्रथम मील का पत्थर किस अधिनियम/घटना से जुड़ा था?'},
+   options:{en:['Regulating Act 1773','Pitt\'s India Act 1784','Charter Act 1813','Charter Act 1833'],
+            hi:['रेग्युलेटिंग एक्ट 1773','पिट्स इंडिया एक्ट 1784','चार्टर एक्ट 1813','चार्टर एक्ट 1833']},
+   correct:0},
+  {id:2, type:'mcq',
+   text:{en:'Which Act created the office of the Governor-General of Bengal? / कौन सा अधिनियम बंगाल के गवर्नर-जनरल के पद का निर्माण करता है?'},
+   options:{en:['Regulating Act 1773','Pitt\'s India Act 1784','Charter Act 1813','Government of India Act 1833'],
+            hi:['रेगुलेटिंग एक्ट 1773','पिट्स इंडिया एक्ट 1784','चार्टर एक्ट 1813','भारत सरकार अधिनियम 1833']},
+   correct:0},
+  {id:3, type:'mcq',
+   text:{en:'Pitt\'s India Act of 1784 established a dual system of control between whom? / 1784 के पिट्स एक्ट ने किसके बीच द्वैध नियंत्रण स्थापित किया?'},
+   options:{en:['The Crown and the Company','Parliament and the Company','Governor-General and Council','Company and Provinces'],
+            hi:['क्राउन और कंपनी','पार्लियामेंट और कंपनी','गवर्नर-जनरल और काउंसिल','कंपनी और प्रांत']},
+   correct:0},
+  {id:4, type:'mcq',
+   text:{en:'Which Charter/Act ended the East India Company\'s trade monopoly with India? / किस अधिनियम ने कंपनी के व्यापारिक एकाधिकार को समाप्त किया?'},
+   options:{en:['Charter Act 1813','Regulating Act 1773','Pitt\'s Act 1784','Charter Act 1833'],
+            hi:['चार्टर एक्ट 1813','रेगुलेटिंग एक्ट 1773','पिट्स एक्ट 1784','चार्टर एक्ट 1833']},
+   correct:0},
+  {id:5, type:'mcq',
+   text:{en:'The Charter Act of 1833 transformed the Governor-General of Bengal into Governor-General of ____? / 1833 के चार्टर एक्ट ने बंगाल के गवर्नर-जनरल को किसका गवर्नर-जनरल बनाया?'},
+   options:{en:['All India','Madras Presidency','Bombay Presidency','Burmese territories'],
+            hi:['समस्त भारत','मैड्रास प्रेसीडेंसी','बॉम्बे प्रेसीडेंसी','बर्मा क्षेत्र']},
+   correct:0},
+  {id:6, type:'mcq',
+   text:{en:'Which Act first introduced a Law Commission in India? / किस अधिनियम ने भारत में प्रथम विधि आयोग की शुरुआत की?'},
+   options:{en:['Charter Act 1833','Indian Councils Act 1861','Regulating Act 1773','Government of India Act 1919'],
+            hi:['चार्टर एक्ट 1833','इंडियन काउंसिल्स एक्ट 1861','रेगुलेटिंग एक्ट 1773','भारत सरकार एक्ट 1919']},
+   correct:0},
+  {id:7, type:'mcq',
+   text:{en:'Which Act separated legislative and executive functions for the first time? / किस अधिनियम ने पहली बार विधायी व कार्यकारी कार्यों को विभक्त किया?'},
+   options:{en:['Indian Councils Act 1861','Charter Act 1813','Indian Councils Act 1892','Government of India Act 1919'],
+            hi:['इंडियन काउंसिल्स एक्ट 1861','चार्टर एक्ट 1813','इंडियन काउंसिल्स एक्ट 1892','भारत सरकार एक्ट 1919']},
+   correct:0},
+  {id:8, type:'mcq',
+   text:{en:'Which Act allowed nomination of Indians to the Governor-General\'s Council for the first time? / किस अधिनियम ने पहली बार गवर्नर-जनरल की परिषद में भारतीयों की नियुक्ति की अनुमति दी?'},
+   options:{en:['Indian Councils Act 1861','Charter Act 1833','Indian Councils Act 1892','Government of India Act 1919'],
+            hi:['इंडियन काउंसिल्स एक्ट 1861','चार्टर एक्ट 1833','इंडियन काउंसिल्स एक्ट 1892','भारत सरकार एक्ट 1919']},
+   correct:0},
+  {id:9, type:'mcq',
+   text:{en:'Which Act introduced limited elections/representation (indirect) in legislative councils? / किस अधिनियम ने (प्रत्यक्ष नहीं) सीमित प्रतिनिधित्व/अप्रत्यक्ष चुनाव पेश किया?'},
+   options:{en:['Indian Councils Act 1892','Charter Act 1833','Regulating Act 1773','Indian Councils Act 1861'],
+            hi:['इंडियन काउंसिल्स एक्ट 1892','चार्टर एक्ट 1833','रेगुलेटिंग एक्ट 1773','इंडियन काउंसिल्स एक्ट 1861']},
+   correct:0},
+  {id:10, type:'mcq',
+   text:{en:'Which Act introduced separate electorates for Muslims? / किस अधिनियम ने मुसलमानों के लिए पृथक निर्वाचक मंडल की व्यवस्था की?'},
+   options:{en:['Indian Councils Act 1909 (Morley-Minto)','Government of India Act 1919','Government of India Act 1935','Charter Act 1813'],
+            hi:['इंडियन काउंसिल्स एक्ट 1909 (मॉर्ले-मिंटो)','भारत सरकार एक्ट 1919','भारत सरकार एक्ट 1935','चार्टर एक्ट 1813']},
+   correct:0},
+  {id:11, type:'mcq',
+   text:{en:'Morley-Minto reforms (1909) are principally associated with which feature? / 1909 के मॉर्ले-मिंटो सुधार मुख्यतः किस विशेषता से जुड़े हैं?'},
+   options:{en:['Separate electorates for Muslims','Dyarchy','Provincial autonomy','Franchise for All'],
+            hi:['मुसलमानों के लिए पृथक निर्वाचक मंडल','द्वैध शासन','प्रांतीय स्वायत्तता','सर्वसम्मत मताधिकार']},
+   correct:0},
+  {id:12, type:'mcq',
+   text:{en:'Which Act introduced Dyarchy in provinces? / किस अधिनियम ने प्रांतों में द्वैध शासन (Dyarchy) लागू किया?'},
+   options:{en:['Government of India Act 1919','Government of India Act 1935','Indian Councils Act 1892','Charter Act 1833'],
+            hi:['भारत सरकार एक्ट 1919','भारत सरकार एक्ट 1935','इंडियन काउंसिल्स एक्ट 1892','चार्टर एक्ट 1833']},
+   correct:0},
+  {id:13, type:'mcq',
+   text:{en:'Under Dyarchy provincial subjects were divided into which two categories? / द्वैध शासन में प्रांतीय विषय किन दो वर्गों में विभक्त हुए?'},
+   options:{en:['Reserved and Transferred','Federal and State','Central and Local','Mandatory and Optional'],
+            hi:['रिज़र्व्ड और ट्रांसफरड','संघ और राज्य','केंद्र और स्थानीय','अनिवार्य और वैकल्पिक']},
+   correct:0},
+  {id:14, type:'mcq',
+   text:{en:'Montagu-Chelmsford reforms resulted in which Act? / मांटेग्यू-चेम्सफोर्ड सुधार किस अधिनियम का रूप बने?'},
+   options:{en:['Government of India Act 1919','Government of India Act 1935','Indian Councils Act 1909','Regulating Act 1773'],
+            hi:['भारत सरकार एक्ट 1919','भारत सरकार एक्ट 1935','इंडियन काउंसिल्स एक्ट 1909','रेगुलेटिंग एक्ट 1773']},
+   correct:0},
+  {id:15, type:'mcq',
+   text:{en:'Which body was first constituted as Public Service Commission in India? / भारत में किस निकाय को पहले पब्लिक सर्विस कमीशन के रूप में गठित किया गया?'},
+   options:{en:['Public Service Commission (as recommended in 1919)','Provincial Service Commissions','Federal Assembly','Indian Councils'],
+            hi:['पब्लिक सर्विस कमीशन (1919 के अनुसार)','प्रांतीय सेवा आयोग','फेडरल असेंबली','इंडियन काउंसिल्स']},
+   correct:0},
+  {id:16, type:'mcq',
+   text:{en:'The Government of India Act 1935 is notable for introducing what major feature? / 1935 के एक्ट की सबसे प्रमुख विशेषता क्या थी?'},
+   options:{en:['Provincial autonomy','Separate electorate','Dyarchy at Centre','Weakening of Parliament'],
+            hi:['प्रांतीय स्वायत्तता','पृथक निर्वाचक मंडल','केंद्र में द्वैध शासन','पार्लियामेंट का कमजोर होना']},
+   correct:0},
+  {id:17, type:'mcq',
+   text:{en:'Which Act proposed an All-India Federation? / किस अधिनियम ने अखिल-भारतीय महासंघ का प्रस्ताव दिया?'},
+   options:{en:['Government of India Act 1935','Government of India Act 1919','Charter Act 1833','Indian Councils Act 1892'],
+            hi:['भारत सरकार एक्ट 1935','भारत सरकार एक्ट 1919','चार्टर एक्ट 1833','इंडियन काउंसिल्स एक्ट 1892']},
+   correct:0},
+  {id:18, type:'mcq',
+   text:{en:'Which commission recommended constitutional reforms before 1935? / 1935 से पहले किस आयोग ने संवैधानिक सुधारों की सिफारिश की?'},
+   options:{en:['Simon Commission','Montagu Commission','Minto Commission','Hunter Commission'],
+            hi:['साइमन आयोग','मॉण्टाग्यू आयोग','मिन्टो आयोग','हंटर आयोग']},
+   correct:0},
+  {id:19, type:'mcq',
+   text:{en:'Why was the Simon Commission boycotted widely in India? / साइमन आयोग का भारत में व्यापक रूप से बहिष्कार क्यों किया गया?'},
+   options:{en:['It had no Indian members','It proposed partition','It was too lenient','It supported princely states'],
+            hi:['इसमें कोई भारतीय सदस्य नहीं था','इसने विभाजन प्रस्तावित किया','यह बहुत सहनशील था','यह रियासतों का समर्थन करता था']},
+   correct:0},
+  {id:20, type:'mcq',
+   text:{en:'Which milestone directly influenced the framing of the Indian Constitution? / कौन-सा मील का पत्थर भारतीय संविधान के मसौदे पर सीधे प्रभाव डालता है?'},
+   options:{en:['Government of India Act 1935','Regulating Act 1773','Charter Act 1813','Pitt\'s Act 1784'],
+            hi:['भारत सरकार एक्ट 1935','रेगुलेटिंग एक्ट 1773','चार्टर एक्ट 1813','पिट्स एक्ट 1784']},
+   correct:0},
+  {id:21, type:'mcq',
+   text:{en:'The Constituent Assembly in India was formed in which year? / संविधान सभा कब गठित हुई थी?'},
+   options:{en:['1946','1947','1935','1950'],
+            hi:['1946','1947','1935','1950']},
+   correct:0},
+  {id:22, type:'mcq',
+   text:{en:'Who was the Chairman of the Drafting Committee of the Indian Constitution? / भारतीय संविधान के ड्राफ्टिंग कमेटी के चेयरमैन कौन थे?'},
+   options:{en:['Dr. B.R. Ambedkar','Jawaharlal Nehru','Sardar Patel','Rajendra Prasad'],
+            hi:['डॉ. बी.आर. अंबेडकर','जवाहरलाल नेहरू','सरदार पटेल','राजेंद्र प्रसाद']},
+   correct:0},
+  {id:23, type:'mcq',
+   text:{en:'Which report provided suggestions for fundamental rights and governance? / किस रिपोर्ट ने मौलिक अधिकारों और शासन के लिए सुझाव दिए?'},
+   options:{en:['Swaraj and various committee reports (historic)','Simon Commission report','Montagu-Chelmsford report','Hunter Commission report'],
+            hi:['स्वराज और विभिन्न समितियों की रिपोर्ट (ऐतिहासिक)','साइमन आयोग रिपोर्ट','मॉण्टाग्यू-चेम्सफोर्ड रिपोर्ट','हंटर आयोग रिपोर्ट']},
+   correct:0},
+  {id:24, type:'mcq',
+   text:{en:'Which document did the Constituent Assembly adopt to begin framing the Constitution? / संविधान सभा ने संविधान का मसौदा बनाना शुरू करने के लिए किस दस्तावेज को अपनाया?'},
+   options:{en:['Objectives Resolution','Regulating Act','Preamble of 1935','Simon Report'],
+            hi:['ऑब्जेक्टिव्स रिज़ोल्यूशन','रेगुलेटिंग एक्ट','1935 का प्रस्ताव','साइमन रिपोर्ट']},
+   correct:0},
+  {id:25, type:'mcq',
+   text:{en:'On which date was the Constitution of India adopted by the Constituent Assembly? / संविधान सभा ने भारतीय संविधान को किस तिथि को अंगीकृत किया?'},
+   options:{en:['26 November 1949','26 January 1950','15 August 1947','26 November 1950'],
+            hi:['26 नवम्बर 1949','26 जनवरी 1950','15 अगस्त 1947','26 नवम्बर 1950']},
+   correct:0}
+];
+
+// ========== App State ==========
+let state = {
+  currentIndex: 0,
+  answers: {},     // {id: selectedOptionIndex}
+  marked: new Set(),
+  startedAt: null,
+  remainingSeconds: null,
+  timer: null,
+  timeLimitMinutes: 60
+};
+
+// ========== Helpers & UI ==========
+const qtotalEl = document.getElementById('qtotal');
+const qnumEl = document.getElementById('qnum');
+const qboxEl = document.getElementById('qbox');
+const qnGridEl = document.getElementById('qnGrid');
+const remainingEl = document.getElementById('remaining');
+const progressEl = document.getElementById('progress');
+const timerEl = document.getElementById('timer');
+
+qtotalEl.textContent = 100;
+renderNav();
+renderQuestion(0);
+updateProgress();
+
+function renderNav(){
+  qnGridEl.innerHTML = '';
+  for(let i=0;i<100;i++){
+    const btn = document.createElement('div');
+    btn.className = 'qn';
+    btn.textContent = i+1;
+    btn.dataset.idx = i;
+    btn.addEventListener('click',()=>{ saveAnswer(); renderQuestion(i); });
+    qnGridEl.appendChild(btn);
+  }
+}
+
+function renderQuestion(i){
+  state.currentIndex = i;
+  const q = QUESTIONS[i];
+  qnumEl.textContent = q ? q.id : (i+1);
+  // if question missing (because part not yet added), show placeholder
+  if(!q){
+    qboxEl.innerHTML = `<div class="small">Question ${i+1} not loaded yet. Waiting for remaining parts.</div>`;
+    return;
+  }
+  const lang = 'en'; // default english. could add toggle later
+  let html = `<div><strong>${q.id}. ${q.text[lang]}</strong></div><div class="options">`;
+  const opts = q.options[lang];
+  opts.forEach((opt,idx)=>{
+    const checked = (state.answers[q.id] === idx) ? 'checked' : '';
+    html += `<label class="option"><input type="radio" name="opt" value="${idx}" ${checked}> ${opt}</label>`;
+  });
+  html += `</div>`;
+  qboxEl.innerHTML = html;
+  // mark nav button style
+  Array.from(qnGridEl.children).forEach(el=>{ el.classList.remove('answered'); });
+  if(state.answers[q.id] !== undefined) qnGridEl.children[i].classList.add('answered');
+  updateProgress();
+}
+
+// ========== Save / Navigation ==========
+function saveAnswer(){
+  const q = QUESTIONS[state.currentIndex];
+  if(!q) return;
+  const sel = qboxEl.querySelector('input[name="opt"]:checked');
+  if(sel) state.answers[q.id] = parseInt(sel.value,10);
+  else delete state.answers[q.id];
+  persistState();
+  updateProgress();
+}
+document.getElementById('nextBtn').addEventListener('click',()=>{
+  saveAnswer();
+  if(state.currentIndex < 99) renderQuestion(state.currentIndex+1);
+});
+document.getElementById('prevBtn').addEventListener('click',()=>{
+  saveAnswer();
+  if(state.currentIndex > 0) renderQuestion(state.currentIndex-1);
+});
+document.getElementById('markBtn').addEventListener('click',()=>{
+  const q = QUESTIONS[state.currentIndex];
+  if(!q) return;
+  if(state.marked.has(q.id)) state.marked.delete(q.id);
+  else state.marked.add(q.id);
+  persistState();
+  updateProgress();
+});
+
+function updateProgress(){
+  const answered = Object.keys(state.answers).length;
+  const marked = state.marked.size;
+  progressEl.textContent = `Answered: ${answered} | Marked: ${marked}`;
+  remainingEl.textContent = 100 - answered;
+  // style nav answered
+  for(let i=0;i<100;i++){
+    const el = qnGridEl.children[i];
+    const q = QUESTIONS[i];
+    if(q && state.answers[q.id] !== undefined) el.classList.add('answered');
+    else el.classList.remove('answered');
+  }
+}
+
+// ========== Timer ==========
+document.getElementById('startBtn').addEventListener('click',()=>{
+  if(!state.remainingSeconds) {
+    state.timeLimitMinutes = parseInt(document.getElementById('timeSelect').value,10);
+    state.remainingSeconds = state.timeLimitMinutes*60;
+  }
+  startTimer();
+});
+
+function startTimer(){
+  if(state.timer) clearInterval(state.timer);
+  state.timer = setInterval(()=>{
+    state.remainingSeconds--;
+    const m = Math.floor(state.remainingSeconds/60);
+    const s = state.remainingSeconds%60;
+    timerEl.textContent = `Time: ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(state.remainingSeconds<=0){ clearInterval(state.timer); autoSubmit(); }
+  },1000);
+}
+
+// ========== Submit / Export ==========
+document.getElementById('submitBtn').addEventListener('click',()=>{ if(confirm('Submit test?')) doSubmit(); });
+
+function doSubmit(){
+  saveAnswer();
+  // score MCQs available in QUESTIONS entries that exist
+  let mcqTotal=0, mcqCorrect=0;
+  for(let i=0;i<100;i++){
+    const q = QUESTIONS[i];
+    if(!q) continue;
+    if(q.type==='mcq') {
+      mcqTotal++;
+      const ans = state.answers[q.id];
+      if(typeof ans !== 'undefined' && ans === q.correct) mcqCorrect++;
+    }
+  }
+  const out = document.createElement('div');
+  out.className='card';
+  out.innerHTML = `<h3>Test Submitted</h3><p class="small">MCQ Score: ${mcqCorrect} / ${mcqTotal}</p><p class="small">Answers saved locally. Download CSV to export.</p><div style="margin-top:8px"><button id="downCSV">Download CSV</button></div>`;
+  document.querySelector('.qbox').innerHTML = '';
+  document.querySelector('.qbox').appendChild(out);
+  document.getElementById('downCSV').addEventListener('click',downloadCSV);
+  persistState();
+}
+
+function downloadCSV(){
+  const rows = [['QID','Question (EN)','Question (HI)','Answer (EN)','Correct (EN)']];
+  for(let i=0;i<100;i++){
+    const q = QUESTIONS[i];
+    if(!q) continue;
+    const ansIdx = state.answers[q.id];
+    const ansText = (typeof ansIdx === 'number') ? q.options.en[ansIdx] : '';
+    rows.push([q.id, q.text.en, q.text.hi, ansText, q.options.en[q.correct]]);
+  }
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'mock_responses.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+// 
